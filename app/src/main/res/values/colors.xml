@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4a148c</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="purple">#1B195B</color>
+    <color name="custom_color">#FFFFFF</color>
+    <color name="custom1">#000C66</color>
+
+    <color name="transparent">#00000000</color>
+
+    <!-- Cool Blue-->
+    <color name="DB_1">#005073</color>
+    <color name="DB_2">#107DAC</color>
+    <color name="DB_3">#189AD3</color>
+    <color name="DB_4">#1EBBD7</color>
+    <color name="DB_5">#71C7EC</color>
+
+    //onboarding colors
+    <color name="background">#F0F4F3</color>
+    <color name="buttontext">#50C2C9</color>
+
+    //indicator color
+    <color name="inactive">#8B17A0</color>
+    <color name="active">#4A0D55</color>
+
+</resources>

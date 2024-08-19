@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">Eye On Road</string>
+    <string name="get_started">Get started</string>
+    <string name="get_started1">Get Started</string>
+    <string name="skippy">skip</string>
+    <string-array name="model_array">
+        <item>192</item>
+        <item>320</item>
+        <item>640</item>
+    </string-array>
+
+    //Description
+    <string name="desc_one">Grow your Business By Accepting Card Payments with The New Card Reader</string>
+    <string name="desc_two">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</string>
+    <string name="desc_three">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</string>
+    <string name="desc_fourth">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua</string>
+
+    //Notification Sound
+    <string-array name="sample_sounds">
+        <item>Alert Sound 1</item>
+        <item>Alert Sound 2</item>
+        <item>Alert Sound 3</item>
+    </string-array>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

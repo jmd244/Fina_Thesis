@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".permission.Permission_Contacts"
+    android:padding="16dp"
+    android:background="#189AD3"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/gpsLocation"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="80dp"
+        android:src="@drawable/contact"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+        android:id="@+id/permissionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:fontFamily="@font/lato_black"
+        android:paddingLeft="5dp"
+        android:layout_marginTop="15dp"
+        android:text="ACCESS YOUR CONTACTS"
+        android:textColor="#fff"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gpsLocation" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/poppins"
+        android:justificationMode="inter_word"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:text="Please allow us to access your contacts to notify your contact person in case of emergency. "
+        android:textAlignment="viewStart"
+        android:textColor="#000"
+        app:layout_constraintTop_toBottomOf="@id/permissionTitle" />
+
+    <Button
+        android:id="@+id/nextButton_5"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins"
+        android:text="START"
+        android:textColor="#fff"
+        android:textSize="15sp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.75"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="visible"
+        android:enabled="true"
+        app:layout_constraintBottom_toTopOf="@id/backButton_5"/>
+
+    <Button
+        android:id="@+id/backButton_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1.25dp"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="@font/poppins"
+        android:text="BACK"
+        android:textColor="#fff"
+        android:textSize="15sp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="invisible"
+        android:enabled="false"/>
+</androidx.constraintlayout.widget.ConstraintLayout>

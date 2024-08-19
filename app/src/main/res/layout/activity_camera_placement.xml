@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="#189AD3"
+    android:orientation="vertical"
+    tools:context=".permission.camera_placement">
+
+    <ImageView
+        android:id="@+id/gpsLocation"
+        android:layout_width="320dp"
+        android:layout_height="350dp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="80dp"
+        android:src="@drawable/placement"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/permissionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:fontFamily="@font/lato_black"
+        android:paddingLeft="5dp"
+        android:text="SECURE PHONE HOLDER"
+        android:textColor="#fff"
+        android:textSize="28sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gpsLocation" />
+
+    <TextView
+        android:id="@+id/description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/poppins"
+        android:justificationMode="inter_word"
+        android:paddingLeft="25dp"
+        android:paddingRight="25dp"
+        android:text="Ensure that the phone holder is properly mounted and does not obstruct the driver's view. Make sure that the driver's face is visible on camera."
+        android:textAlignment="viewStart"
+        android:textColor="#000"
+        app:layout_constraintTop_toBottomOf="@id/permissionTitle" />
+
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/poppins"
+        android:text="NEXT"
+        android:textColor="#fff"
+        android:textSize="15sp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.75"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/backButton"/>
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1.25dp"
+        android:layout_marginBottom="40dp"
+        android:fontFamily="@font/poppins"
+        android:text="BACK"
+        android:textColor="#fff"
+        android:textSize="15sp"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.75"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

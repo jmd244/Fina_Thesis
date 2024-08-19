@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preloaded_fonts" translatable="false">
+        <item>@font/poppins</item>
+        <item>@font/poppins_bold</item>
+        <item>@font/poppins_bold_italic</item>
+        <item name="android:fontFamily"> @font/lato_black </item>
+        <item name="android:fontFamily"> @font/lato_regular </item>
+        <item name="android:fontFamily"> @font/lato_bi </item>
+    </array>
+</resources>
