@@ -1,6 +1,7 @@
 package com.vyw.tflite
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
 import android.content.Context
@@ -9,9 +10,12 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.PixelFormat
 import android.graphics.drawable.ColorDrawable
+import android.location.LocationManager
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
+import android.telephony.SmsManager
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.View
@@ -35,6 +39,7 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
     private lateinit var settings: SettingsPref
     private lateinit var calibration: Calibration
     private var mediaPlayer: MediaPlayer? = null
+    private var volume: Int = 0
     private val REQUEST_CAMERA = 100
 
     private val locationPermissionCode = 2
@@ -62,18 +67,21 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
     @Volatile
     private var alertIntervalStartTime = alertStartTime
 
-    @Volatile
-    private var isNeedAAttention = 0
+    @Volatile private var isNeedAAttention = 0
+    @Volatile private var alertType = ""
 
     @Volatile private var MARcalibrated = 0f
+    @Volatile private var MARthresholdTimeCounter = 0
+    @Volatile private var MARalertStartTime = 0
 
     @Volatile private var EARcalibrated = 0f
+    @Volatile private var EARThreshold = 0f
     @Volatile private var EARthresholdTimeCounter = 0
     @Volatile private var alert1Counter = 0
     @Volatile private var alertPresentTime = 0L
     @Volatile private var alertIntervalTime = 0L
 
-    @Volatile private lateinit var dialog : Dialog
+    @Volatile private var dialog : Dialog? = null
 
 
 
@@ -81,28 +89,55 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
 
 
     // This function serves as a sound for the alert
-    private fun Context.playSound(alertType: String, index : Int) {
-        if (mediaPlayer?.isPlaying == true) {
-            Log.d("Media", "Media is playing!")
-        } else {
-            var resourceID = 0
-            when (alertType) {
-                "EAR" -> {
-                    when (index) {
-                        1 -> resourceID = R.raw.e1
-                        2 -> resourceID = R.raw.e2
-                        3 -> resourceID = R.raw.e3
+    private fun playSound(alert: String) : Int {
+        runOnUiThread {
+            if(mediaPlayer == null) {
+                when (alert) {
+                    "No Face" -> {
+                        mediaPlayer = MediaPlayer.create(this, R.raw.nf)
+                    }
+                    "MAR" -> {
+                        mediaPlayer = MediaPlayer.create(this, R.raw.e1)
+                    }
+                    "EAR" -> {
+                        mediaPlayer = MediaPlayer.create(this, R.raw.e2)
+                    }
+                    "Critical" -> {
+                        mediaPlayer = MediaPlayer.create(this, R.raw.e3)
                     }
                 }
-                "No Face" -> resourceID = R.raw.nf
+
+                val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                val newVolume = volume.coerceIn(0, maxVolume)
+                audioManager.setStreamVolume(
+                    AudioManager.STREAM_MUSIC,
+                    newVolume,
+                    0
+                )
+                mediaPlayer?.setVolume(volume.toFloat()/100, volume.toFloat()/100)
+                mediaPlayer?.start()
             }
-            mediaPlayer = MediaPlayer.create(this, resourceID)
-            mediaPlayer!!.start()
+        }
+        return 0
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val Blink_monitor = Runnable{
+        while (isCameraOpen){
+            if(isNeedAAttention == 0){
+
+            }
+            try {
+                Thread.sleep(100)
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    private val alert = Runnable {
+    private val EARMAR_monitor = Runnable {
         while (isCameraOpen) {
             if (isNeedAAttention == 0) {
                 lateinit var data : FloatArray
@@ -114,9 +149,28 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
 
                     alertPresentTime = Instant.now().toEpochMilli()
 
-                    earSensor(ear)
-                    marSensor(mar)
+                    alertType = earSensor(ear)
+                    if(alertType.isEmpty()){
+                        alertType = marSensor(mar)
+                    }
 
+                    when(alertType){
+                        "EAR" -> {
+                            makeDialog(R.layout.dialog_alert2)
+                            playSound(alertType)
+                        }
+                        "MAR" -> {
+                            makeDialog(R.layout.dialog_alert1)
+                            playSound(alertType)
+                        }
+                        "No Face" -> {
+                            playSound(alertType)
+                            EARthresholdTimeCounter =  0
+                        }
+                        else -> {
+                            dialog_purge()
+                        }
+                    }
 
                     alertIntervalTime = (alertPresentTime - alertIntervalStartTime) / 1000
 
@@ -132,12 +186,11 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
                     Log.d("NullDetector", "No Face")
                 }
             } else {
-                runOnUiThread{
-                    if(!dialog.isShowing){
-                        makeDialog(R.layout.dialog_alert3)
-                    }
+                if(dialog==null){
+                    makeDialog(R.layout.dialog_alert3)
                 }
-                playSound("EAR",3)
+                playSound("Critical")
+                alertType = "Critical"
             }
 
             try {
@@ -152,17 +205,14 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
         super.onCreate(savedInstanceState)
         binding = ActivityCameraStarterBinding.inflate(layoutInflater)
 
-//        if(calibration.ear.isEmpty()){
-//            val intent = Intent(this, Calibrate::class.java)
-//            startActivity(intent)
-//        }
         settings = SettingsPref(this)
+        volume = settings.getVolume()
         val calibrateBundle = intent.getBundleExtra("data")
         val earAVG = calibrateBundle!!.getFloat("earAVG")
         EARcalibrated = calibrateBundle.getFloat("earAVG")
+        EARThreshold = EARcalibrated * 0.65f
         val marAVG = calibrateBundle.getFloat("marAVG")
         MARcalibrated = calibrateBundle.getFloat("marAVG")
-        var pref = settings.getPreference()
         sensor = settings.getSettings()?.let {
             ThresholdSensor(
                 earAVG,
@@ -177,18 +227,10 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
         Log.v("CalibrationData", "earAVG : ${calibration.earAVG}")
         setContentView(binding.root)
 
-        blazefacecnn.initiateCamera(calibration.earAVG.toFloat(), calibration.rectAVG.toFloat())
+        blazefacecnn.initiateCamera()
 
         binding.cameraview.holder.setFormat(PixelFormat.RGBA_8888)
         binding.cameraview.holder.addCallback(this)
-
-//        binding.isdraw.setOnCheckedChangeListener { _, isChecked ->
-//            draw = isChecked
-//            reload()
-//        }
-        binding.stopButton.setOnClickListener {
-//            sensor.cleanUpMediaPlayer()
-        }
 
         reload()
     }
@@ -203,7 +245,7 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun surfaceCreated(holder: SurfaceHolder) {
         isCameraOpen = blazefacecnn.openCamera(facing)
-        threadPool.execute(alert)
+        threadPool.execute(EARMAR_monitor)
     }
 
     override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
@@ -243,6 +285,7 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
     fun back_click(view: View) {
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
+        finish()
     }
 
     @Deprecated("Deprecated in Java")
@@ -265,82 +308,114 @@ class CameraStarter : Activity(), SurfaceHolder.Callback {
         }
     }
 
-    fun makeDialog(layout : Int) {
-        dialogBinding = layoutInflater.inflate(layout, null)
-        dialog = Dialog(this)
-        dialog.setContentView(dialogBinding)
+    @SuppressLint("MissingPermission")
+    fun sendSMS() {
+        runOnUiThread{
+            val phoneNumber = settings.getContactNumber()
+            if (phoneNumber != null) {
+                val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+                var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                if (location == null) {
+                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+                }
+                val latitude = location!!.latitude
+                val longitude = location.longitude
+                Toast.makeText(this, "$latitude, $longitude", Toast.LENGTH_SHORT).show()
 
-        if(layout == R.layout.dialog_alert3){
-            Toast.makeText(this, "Alert 3 activated", Toast.LENGTH_SHORT).show()
-            val closeBtn = dialog.findViewById<Button>(R.id.closeBtn)
-            closeBtn.setOnClickListener {
-                isNeedAAttention = 0
-                alert1Counter = 0
-                dialog.dismiss()
+                val smsManager: SmsManager = SmsManager.getDefault()
+                val message = "Alert!"
+                smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+            }else {
+                Toast.makeText(this, "No contact number", Toast.LENGTH_SHORT).show()
             }
         }
-
-        dialog.window?.setDimAmount(0F)
-        dialog.window?.setWindowAnimations(R.style.CustomDialogTheme)
-        dialog.setCancelable(false)
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-
-
-        dialog.show()
     }
 
-    fun marSensor(marAVG: Float) {
+    fun makeDialog(layout : Int) {
+        runOnUiThread {
+            if(dialog == null) {
+                dialogBinding = layoutInflater.inflate(layout, null)
+                dialog = Dialog(this)
+                dialog!!.setContentView(dialogBinding)
+
+                dialog!!.window?.setDimAmount(0F)
+                dialog!!.window?.setWindowAnimations(R.style.CustomDialogTheme)
+                dialog!!.setCancelable(false)
+                dialog!!.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+                dialog!!.show()
+                if(layout == R.layout.dialog_alert3){
+                    val closeBtn = dialog!!.findViewById<Button>(R.id.closeBtn)
+                    closeBtn.setOnClickListener {
+                        isNeedAAttention = 0
+                        alert1Counter = 0
+                        dialog!!.dismiss()
+                    }
+                }
+            }
+        }
+    }
+
+    fun dialog_purge(){
+        runOnUiThread{
+            if(mediaPlayer != null){
+                if (mediaPlayer!!.isPlaying) {
+                    mediaPlayer!!.stop()
+                    mediaPlayer!!.release()
+                    mediaPlayer = null
+                }
+            }
+            if(dialog != null){
+                dialog!!.hide()
+                dialog!!.dismiss()
+                dialog = null
+            }
+        }
+        alertType = ""
+    }
+
+    fun marSensor(marAVG: Float) : String{
         val marThreshold = 0.60f
         Log.d("MAR sensor", "MARavg = $marAVG, threshold = $marThreshold")
         if(marAVG >= marThreshold){
             Log.w("MAR sensor", "Yawning detected!")
+            alertType = "MAR"
+            return alertType
+        }else{
+            dialog_purge()
+            return ""
         }
     }
 
-    fun earSensor(earAVG: Float){
-        val earThreshold = EARcalibrated * 0.65f
+    fun earSensor(earAVG: Float) : String{
         Log.d(
             "EAR sensor",
-            "EARavg = $earAVG, threshold = $earThreshold"
+            "EARavg = $earAVG, threshold = $EARThreshold"
         )
         if(earAVG == 0f){
-            playSound("No Face",1)
-            EARthresholdTimeCounter =  0
-            if(::dialog.isInitialized){
-                runOnUiThread{
-                    dialog.dismiss()
-                }
-            }
+            alertType = "No Face"
+            return alertType
         }
-        if (earAVG < earThreshold) {
+        if (earAVG < EARThreshold) {
             EARthresholdTimeCounter += 1
+            Log.d("EAR sensor", "Counter = $EARthresholdTimeCounter")
+            if (EARthresholdTimeCounter in 2..3) {
+                Log.d("BlazeIndicator", "Medium alert!")
+                alert1Counter++
+                alertType = "EAR"
+                return alertType
+            } else if (EARthresholdTimeCounter > 4 || alert1Counter > 4) {
+                Log.d("BlazeIndicator", "The driver needs to stop over and rest")
+                isNeedAAttention = 1
+                alertType = "Critical"
+                return alertType
+            }
         } else {
             EARthresholdTimeCounter = 0
+            alertType = ""
+            return alertType
         }
 
-        if (EARthresholdTimeCounter == 0) {
-            if (mediaPlayer?.isPlaying == true) {
-                mediaPlayer!!.stop()
-            }
-            if(::dialog.isInitialized){
-                runOnUiThread{
-                    dialog.dismiss()
-                }
-            }
-        } else if (EARthresholdTimeCounter in 2..2) {
-            Log.d("BlazeIndicator", "Medium alert!")
-            alert1Counter++
-            playSound("EAR",2)
-            runOnUiThread{
-                makeDialog(R.layout.dialog_alert2)
-            }
-        } else if (EARthresholdTimeCounter > 4 || alert1Counter > 4) {
-            Log.d("BlazeIndicator", "The driver needs to stop over and rest")
-            isNeedAAttention = 1
-            mediaPlayer!!.stop()
-            dialog.dismiss()
-        }
-
+        return ""
     }
 }

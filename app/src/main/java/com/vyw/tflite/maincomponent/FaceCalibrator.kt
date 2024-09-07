@@ -105,6 +105,7 @@ class FaceCalibrator : Activity() , SurfaceHolder.Callback {
                 intent.putExtra("earBundle" , bundle)
                 isActiveCalibrate = false
                 startActivity(intent)
+                finish()
             }
         }
     }

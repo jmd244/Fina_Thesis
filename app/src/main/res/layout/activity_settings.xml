@@ -149,7 +149,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/poppins"
-                android:onClick="locClick"
                 android:textColor="#fff"
                 android:textSize="15sp"
                 android:text="View location"/>

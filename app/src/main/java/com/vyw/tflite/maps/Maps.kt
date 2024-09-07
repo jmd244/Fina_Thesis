@@ -31,18 +31,7 @@ class Maps : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        binder.myLoc.setOnClickListener{
-            val dialogBinding = layoutInflater.inflate(R.layout.dialog_alert2, null)
-            val dialog = Dialog(this)
-            dialog.setContentView(dialogBinding)
-
-            dialog.window?.setDimAmount(0F)
-            dialog.window?.setWindowAnimations(R.style.CustomDialogTheme)
-            dialog.setCancelable(false)
-            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
-            dialog.show()
-        }
+        binder.myLoc.setOnClickListener{}
     }
 
     override fun onMapReady(googleMap: GoogleMap) {

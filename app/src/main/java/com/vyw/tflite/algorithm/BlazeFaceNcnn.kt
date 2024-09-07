@@ -10,7 +10,7 @@ class BlazeFaceNcnn {
     external fun closeCamera(): Boolean
     external fun setOutputWindow(surface: Surface?): Boolean
     external fun data() : FloatArray
-    external fun initiateCamera(earAVG: Float, rectAVG: Float)
+    external fun initiateCamera()
 
     companion object{
         init {

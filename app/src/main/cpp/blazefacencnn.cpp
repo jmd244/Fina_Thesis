@@ -1,17 +1,3 @@
-// Tencent is pleased to support the open source community by making ncnn available.
-//
-// Copyright (C) 2021 THL A29 Limited, a Tencent company. All rights reserved.
-//
-// Licensed under the BSD 3-Clause License (the "License"); you may not use this file except
-// in compliance with the License. You may obtain a copy of the License at
-//
-// https://opensource.org/licenses/BSD-3-Clause
-//
-// Unless required by applicable law or agreed to in writing, software distributed
-// under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-// CONDITIONS OF ANY KIND, either express or implied. See the License for the
-// specific language governing permissions and limitations under the License.
-
 #include <android/asset_manager_jni.h>
 #include <android/native_window_jni.h>
 #include <android/native_window.h>
@@ -46,27 +32,7 @@ float distance(cv::Point2f p1, cv::Point2f p2) {
     float res = std::abs(sqrt(pow(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2), 1.0)));
     return res;
 }
-/*
-static int draw_unsupported(cv::Mat& rgb)
-{
-    const char text[] = "unsupported";
 
-    int baseLine = 0;
-    cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 1.0, 1, &baseLine);
-
-    int y = (rgb.rows - label_size.height) / 2;
-    int x = (rgb.cols - label_size.width) / 2;
-
-    cv::rectangle(rgb, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
-                  cv::Scalar(255, 255, 255), -1);
-
-    cv::putText(rgb, text, cv::Point(x, y + label_size.height),
-                cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0));
-
-    return 0;
-}
- */
-/*
 static void draw_fps(cv::Mat& rgb)
 {
     // resolve moving average
@@ -116,7 +82,7 @@ static void draw_fps(cv::Mat& rgb)
     cv::putText(rgb, text, cv::Point(x, y + label_size.height),
                 cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
 }
-*/
+
 static Face *g_blazeface = 0;
 static ncnn::Mutex lock;
 
@@ -130,43 +96,7 @@ private:
     float threshold = 0.15f;
 
 public:
-    MyNdkCamera(float earAVG, float rectAVG) {
-        double percentage = 0.80;
-        threshold = earAVG * percentage;
-        rectAV = rectAVG;
-        __android_log_print(ANDROID_LOG_DEBUG, "CalibrationData", "earAVG with %f : %f", percentage,
-                            threshold);
-    }
-
     void on_image_render(cv::Mat &rgb) const override;
-
-//    int draw_alert(cv::Mat &rgb) const {
-//        if (faceobjects.size() == 1) {
-//            float avgEAR = (faceobjects[0].earright + faceobjects[0].earleft) / 2;
-//
-//            if (avgEAR < threshold) {
-//                if (timeSecStart == 0) {
-//                    time(&timeSecStart);
-//                }
-//                time_t timeSecNow;
-//                time(&timeSecNow);
-//                int sec = (int) timeSecNow - (int) timeSecStart;
-//                //__android_log_print(ANDROID_LOG_DEBUG, "alertTime", "time %i", sec);
-//                if (sec > 2 && sec < 6) {
-////                __android_log_print(ANDROID_LOG_DEBUG, "alertTimeNotif", "ALERT");
-//                    faceAlert = 1;
-//                } else if (sec > 5) {
-//                    faceAlert = 2;
-//                }
-//            } else {
-//                time(&timeSecStart);
-//                faceAlert = 0;
-//            }
-//
-//        }
-//        return 0;
-//    }
-
 };
 
 bool isdraw = true;
@@ -191,7 +121,7 @@ void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
 //            draw_unsupported(rgb);
         }
     }
-//    draw_fps(rgb);
+    draw_fps(rgb);
 }
 
 //Class for DETECTOR
@@ -223,7 +153,7 @@ void CameraCalibration::on_image_render(cv::Mat &rgb) const {
 //            draw_unsupported(rgb);
         }
     }
-//    draw_fps(rgb);
+    draw_fps(rgb);
 }
 
 static MyNdkCamera *g_camera = 0;
@@ -394,9 +324,8 @@ Java_com_vyw_tflite_algorithm_BlazeFaceNcnn_data(JNIEnv *env, jobject thiz) {
 }
 
 JNIEXPORT void JNICALL
-Java_com_vyw_tflite_algorithm_BlazeFaceNcnn_initiateCamera(JNIEnv *env, jobject thiz, jfloat earAVG,
-                                                           jfloat rectAVG) {
-    g_camera = new MyNdkCamera(earAVG, rectAVG);
+Java_com_vyw_tflite_algorithm_BlazeFaceNcnn_initiateCamera(JNIEnv *env, jobject thiz) {
+    g_camera = new MyNdkCamera();
     __android_log_print(ANDROID_LOG_DEBUG, "reactangleArea", "AVG rect = %f", rectAV);
 }
 }

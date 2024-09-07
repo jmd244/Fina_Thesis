@@ -291,8 +291,8 @@ int NdkCamera::open(int _camera_facing)
         ACameraOutputTarget_create(image_reader_surface, &image_reader_target);
         ACaptureRequest_addTarget(capture_request, image_reader_target);
 
-        int32_t mFramerateRange[2] = {30,30};
-        
+        int32_t mFramerateRange[2] = {15,15};
+        ACaptureRequest_setEntry_i32(capture_request, ACAMERA_CONTROL_AE_TARGET_FPS_RANGE,2, mFramerateRange);
     }
 
     // capture session

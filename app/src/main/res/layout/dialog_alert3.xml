@@ -1,48 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="300dp"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp">
-
-    <androidx.cardview.widget.CardView
+    android:orientation="vertical"
+    android:gravity="center"
+    android:background="@drawable/dialog_border">
+    <ImageView
+        android:id="@+id/sign2"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="Alert sign"
+        android:src="@raw/a3"
+        android:adjustViewBounds="true"/>
+    <TextView
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_margin="20dp">
-            <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_margin="20dp">
-                <ImageView
-                    android:id="@+id/sign2"
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:contentDescription="Alert sign"
-                    android:src="@raw/a3"
-                    android:adjustViewBounds="true"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="This is Last alert of the system, we stop the system to detect you drowsiness level if the you feel sleepy please dont hesitate to park your car in the nearest parking lot or the side of the roadd to rest to continue the detection just click close button"
-                    android:textSize="20sp"/>
-
-                <Button
-                    android:id="@+id/closeBtn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Close"/>
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-    </androidx.cardview.widget.CardView>
-
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:text="Attention! Drowsiness Detected!!!"
+        android:textColor="@color/black"
+        android:textSize="25sp"/>
+    <Button
+        android:layout_marginTop="20dp"
+        android:id="@+id/closeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Close"/>
 </LinearLayout>

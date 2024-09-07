@@ -1,9 +1,14 @@
 package com.vyw.tflite
 
 import android.R.raw
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.AssetFileDescriptor
+import android.location.LocationManager
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.provider.ContactsContract
@@ -34,6 +39,7 @@ class Settings_Main : AppCompatActivity() {
     var volume = 50
     var sound = 0
 
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binder = ActivitySettingsBinding.inflate(layoutInflater)
@@ -103,12 +109,16 @@ class Settings_Main : AppCompatActivity() {
         val btnaddContact = binder.btnaddContact
         btnaddContact.setOnClickListener{
             val number = mobileNum.text.toString()
-            val regex = Regex("^09\\d+")
-            val isPatternCorrect = regex.matches(mobileNum.text)
-            if(isPatternCorrect && number.length == 11){
-                contactNum = settings.saveContactNumber(number)
+            if(number.isNotEmpty()){
+                val regex = Regex("^09\\d+")
+                val isPatternCorrect = regex.matches(mobileNum.text)
+                if(isPatternCorrect && number.length == 11){
+                    contactNum = settings.saveContactNumber(number)
+                }else{
+                    Toast.makeText(this, "Invalid mobile number", Toast.LENGTH_SHORT).show()
+                }
             }else{
-                Toast.makeText(this, "Invalid mobile number", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Empy number", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -126,10 +136,23 @@ class Settings_Main : AppCompatActivity() {
         //SMS button
         val smsBtn = binder.smsbtn
         smsBtn.setOnClickListener {
+            val locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+            var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            if (location == null) {
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+            }
+
             val phoneNumber = binder.mobileNum.text.toString()
-            val message = "Sample message"
-            val smsManager = SmsManager.getDefault() as SmsManager
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+            if(phoneNumber.isNotBlank()){
+                val message = "Sample message"
+                val smsManager = SmsManager.getDefault() as SmsManager
+                val sentPI: PendingIntent = PendingIntent.getBroadcast(this, 0, Intent("SMS_SENT"),
+                    PendingIntent.FLAG_IMMUTABLE)
+                smsManager.sendTextMessage(phoneNumber, null, message, sentPI, null)
+            }
+            else{
+                Toast.makeText(this, "Enter a phone number first", Toast.LENGTH_SHORT).show()
+            }
         }
 
         val volumeSlidder = binder.volumeSlider
@@ -178,6 +201,14 @@ class Settings_Main : AppCompatActivity() {
                     descriptor.close()
 
                     media.prepare()
+                    val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+                    val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                    val newVolume = volume.coerceIn(0, maxVolume)
+                    audioManager.setStreamVolume(
+                        AudioManager.STREAM_MUSIC,
+                        newVolume,
+                        0
+                    )
                     media.setVolume(volume.toFloat()/100, volume.toFloat()/100)
                     media.start()
                     binder.testAlert.text = "STOP"
@@ -232,21 +263,5 @@ class Settings_Main : AppCompatActivity() {
             }
         }
     }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == locationPermissionCode) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT).show()
-            }
-        }
-    }
-
-    fun locClick(view: View) {}
+    
 }

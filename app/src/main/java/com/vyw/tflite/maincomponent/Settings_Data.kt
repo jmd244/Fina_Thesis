@@ -37,24 +37,32 @@ class SettingsPref(context: Context) {
         }
     }
 
+    fun getContactNumber() : String? {
+        return preferences.getString("contact", "")
+    }
+
+    fun getVolume () : Int {
+        return preferences.getInt("volume", 50)
+    }
+
     fun saveContactNumber(contact : String) : String {
         val editor = preferences.edit()
         editor.putString("contact", contact)
-        editor.commit()
+        editor.apply()
         return contact
     }
 
     fun saveVolume(volume: Int) : Int {
         val editor = preferences.edit()
         editor.putInt("volume", volume)
-        editor.commit()
+        editor.apply()
         return volume
     }
 
     fun saveSoundSpinner(sound: Int) : Int {
         val editor = preferences.edit()
         editor.putInt("sound", sound)
-        editor.commit()
+        editor.apply()
         return sound
     }
 
