@@ -402,37 +402,6 @@ int LandmarkDetect::detect(const cv::Mat& rgb,const cv::Mat& trans_mat, std::vec
         lip_pt.y = x * trans_mat.at<double>(1, 0) + y * trans_mat.at<double>(1, 1) + trans_mat.at<double>(1, 2);
         landmarks[lips_idxs[i]] = lip_pt;
     }
-
-//    float le1 = fabsf((cv::norm(left_eyes[11]) - cv::norm(left_eyes[3])));
-//    float le2 = fabsf((cv::norm(left_eyes[13]) - cv::norm(left_eyes[5])));
-//    float leS = fabsf((cv::norm(left_eyes[0]) - cv::norm(left_eyes[8])));
-
-
-//    float re1 = fabsf((cv::norm(right_eyes[11]) - cv::norm(right_eyes[3])));
-//    float re2 = fabsf((cv::norm(right_eyes[13]) - cv::norm(right_eyes[5])));
-//    float reS = fabsf((cv::norm(right_eyes[8]) - cv::norm(right_eyes[0])));
-//    float re1 = distance(right_eyes[11],right_eyes[3]);
-//    float re2 = distance(right_eyes[13], right_eyes[5]);
-//    float reS = distance(right_eyes[8], right_eyes[0]);
-//    earright = ( re1 + re2 ) / (reS * 2);
-
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "+++++++++++++++++++++++++++++++++++");
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "-----------------------------------");
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Left Vertical 1 {p1:%f},{p4:%f}", norm(left_eyes[0]), norm(left_eyes[8]));
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Left Horizontal 1 {p2:%f},{p6:%f}", norm(left_eyes[11]), norm(left_eyes[3]));
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Left Horizontal 2 {p3:%f},{p5:%f}", norm(left_eyes[13]), norm(left_eyes[5]));
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "LEAR: %f", earleft);
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "-----------------------------------");
-//
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "-----------------------------------");
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Right Vertical 1 {p1:%f},{p4:%f}", norm(right_eyes[0]), norm(right_eyes[8]));
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Right Horizontal 1 {p2:%f},{p6:%f}", norm(right_eyes[11]), norm(right_eyes[3]));
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Right Horizontal 2 {p3:%f},{p5:%f}", norm(right_eyes[13]), norm(right_eyes[5]));
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "REAR: %f", earright);
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "-----------------------------------");
-//    __android_log_print(ANDROID_LOG_DEBUG, "ncnn", "Average EAR: %f", (earleft+earright) / 2);
-
-
     return 0;
 }
 

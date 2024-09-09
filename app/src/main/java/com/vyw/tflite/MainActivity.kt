@@ -112,6 +112,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun btnClick(view: View) {
+//        val intent = Intent(this, Developer::class.java)
+//        startActivity(intent)
         checkPermission()
         if(isAllPermissionTrue){
             val intent = Intent(this, FaceCalibrator::class.java)

@@ -41,6 +41,8 @@ volatile struct Object
     std::vector<cv::Point2f> skeleton;
     std::vector<cv::Point2f> left_eyes;
     std::vector<cv::Point2f> right_eyes;
+    std::chrono::duration<float, std::milli> fd_ms;
+    std::chrono::duration<float, std::milli> fl_ms;
 };
 
 class Face

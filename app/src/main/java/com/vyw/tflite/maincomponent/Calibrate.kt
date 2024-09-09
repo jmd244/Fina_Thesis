@@ -7,6 +7,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import com.vyw.tflite.CameraStarter
+import com.vyw.tflite.Developer
 import com.vyw.tflite.databinding.ActivityCalibrateBinding
 
 class Calibrate: AppCompatActivity() {
@@ -32,7 +33,8 @@ class Calibrate: AppCompatActivity() {
 
         val handler = Handler(Looper.getMainLooper())
         handler.post{
-            val intent = Intent(this, CameraStarter::class.java)
+//            val intent = Intent(this, CameraStarter::class.java)
+            val intent = Intent(this, Developer::class.java)
             var bundle = Bundle()
             bundle.putFloat("earAVG", earAverage.toFloat())
             bundle.putFloat("rectAVG", rectAverage.toFloat())

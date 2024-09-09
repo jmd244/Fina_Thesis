@@ -264,6 +264,8 @@ static void compute_detect_to_roi(Object& obj, const int& target_size)
 
 int Face::detect(const cv::Mat& rgb, std::vector<Object>& objects,float rectAVG, float prob_threshold, float nms_threshold)
 {
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+
     int img_w = rgb.cols;
     int img_h = rgb.rows;
 
@@ -377,6 +379,9 @@ int Face::detect(const cv::Mat& rgb, std::vector<Object>& objects,float rectAVG,
         objects[i].rect.width = x1 - x0;
         objects[i].rect.height = y1 - y0;
 
+        std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+        objects[i].fd_ms = t2 - t1;
+
 
         if(objects[i].rect.area() < rectAVG - (rectAVG * 0.20)){
             objects.resize(i);
@@ -407,9 +412,12 @@ int Face::detect(const cv::Mat& rgb, std::vector<Object>& objects,float rectAVG,
         cv::warpAffine(rgb, objects[i].trans_image, trans_mat, cv::Size(192, 192), 1, 0);
         cv::Mat trans_mat_inv;
         cv::invertAffineTransform(trans_mat, trans_mat_inv);
+        t1 = std::chrono::high_resolution_clock::now();
         landmark.detect(objects[i].trans_image, trans_mat_inv, objects[i].skeleton,
                         objects[i].left_eyes, objects[i].right_eyes, objects[i].earleft,
                         objects[i].earright);
+        t2 = std::chrono::high_resolution_clock::now();
+        objects[i].fl_ms = t2 - t1;
     }
 
     return 0;

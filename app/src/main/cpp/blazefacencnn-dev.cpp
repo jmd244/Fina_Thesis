@@ -68,6 +68,20 @@ static void draw_fps(cv::Mat& rgb)
         avg_fps /= 10.f;
     }
     final_fps = avg_fps;
+    char text[32];
+    sprintf(text, "FPS=%.2f", avg_fps);
+
+    int baseLine = 0;
+    cv::Size label_size = cv::getTextSize(text, cv::FONT_HERSHEY_SIMPLEX, 0.5, 1, &baseLine);
+
+    int y = 0;
+    int x = rgb.cols - label_size.width;
+
+    cv::rectangle(rgb, cv::Rect(cv::Point(x, y), cv::Size(label_size.width, label_size.height + baseLine)),
+                  cv::Scalar(255, 255, 255), -1);
+
+    cv::putText(rgb, text, cv::Point(x, y + label_size.height),
+                cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0));
 }
 
 static Face *g_blazeface = 0;
@@ -87,14 +101,25 @@ public:
 };
 
 bool isdraw = true;
+
 void MyNdkCamera::on_image_render(cv::Mat &rgb) const {
     {
         ncnn::MutexLockGuard g(lock);
+
         if (g_blazeface) {
+            high_resolution_clock::time_point t1 = high_resolution_clock::now();
             g_blazeface->detect(rgb, faceobjects, rectAV);
+//            high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
             if (faceobjects.size() > 0 && isdraw) {
+//                duration<double, std::milli> time_span = t2-t1;
+//                __android_log_print(ANDROID_LOG_DEBUG, "TimeFace","MiliSegundo: %f", time_span.count());
                 g_blazeface->draw(rgb, faceobjects, true);
             }
+
+//            draw_alert(rgb);
+        } else {
+//            draw_unsupported(rgb);
         }
     }
     draw_fps(rgb);
@@ -125,6 +150,8 @@ void CameraCalibration::on_image_render(cv::Mat &rgb) const {
                 mar = faceobjects[0].mar;
                 g_blazeface->draw(rgb, faceobjects, true);
             }
+        } else {
+//            draw_unsupported(rgb);
         }
     }
     draw_fps(rgb);
@@ -277,7 +304,7 @@ JNIEXPORT jfloatArray JNICALL
 Java_com_vyw_tflite_algorithm_BlazeFaceNcnn_data(JNIEnv *env, jobject thiz) {
     jfloatArray result;
 
-    int length = 4;
+    int length = 3;
     result = env->NewFloatArray(length);
     if (result == NULL) {
         return NULL;
@@ -289,7 +316,7 @@ Java_com_vyw_tflite_algorithm_BlazeFaceNcnn_data(JNIEnv *env, jobject thiz) {
         arrayData[0] = ear;
         arrayData[1] = mar;
         arrayData[2] = final_fps;
-        arrayData[3] = faceobjects[0].fdfl_ms.count();
+        arrayData[3] = 0.f;
 
         env->SetFloatArrayRegion(result, 0, length, arrayData);
         return result;
